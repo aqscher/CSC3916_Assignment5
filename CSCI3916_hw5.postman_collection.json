@@ -1,0 +1,359 @@
+{
+  "info": {
+    "_postman_id": "94fa4255-9c17-4e9c-95d5-c3f9c52d8bd6",
+    "name": "CSCI3916_hw3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "28607556"
+  },
+  "item": [
+    {
+      "name": "getMovies",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://csc3916-assignment5-5tqz.onrender.com/movies?",
+          "protocol": "https",
+          "host": [
+            "csc3916-assignment5-5tqz",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": null
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "postMovies",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "\r",
+              "var data = JSON.parse(responseBody);\r",
+              "postman.setEnvironmentVariable(\"movieId\", data.movie._id);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"title3\",\r\n    \"releaseDate\": 2000,\r\n    \"genre\": \"Action\",\r\n    \"actors\": [\r\n        {\"actorName\": \"Test\", \"characterName\": \"test\"},\r\n        {\"actorName\": \"test\", \"characterName\": \"test\"}\r\n    ],\r\n    \"imageUrl\" : \"https://m.media-amazon.com/images/M/MV5BNzQxNzQxNjk5NV5BMl5BanBnXkFtZTgwNTI4MTU0MzE@._V1_FMjpg_UY452_.jpg\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://csc3916-assignment5-5tqz.onrender.com/movies",
+          "protocol": "https",
+          "host": [
+            "csc3916-assignment5-5tqz",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Signup",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"test name\",\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://csc3916-assignment5-5tqz.onrender.com/signup",
+          "protocol": "https",
+          "host": [
+            "csc3916-assignment5-5tqz",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Signin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var data = JSON.parse(responseBody);\r",
+              "postman.setEnvironmentVariable(\"token\", data.token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://csc3916-assignment5-5tqz.onrender.com/signin",
+          "protocol": "https",
+          "host": [
+            "csc3916-assignment5-5tqz",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "signin"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getMovies q?reviews?",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();\r",
+              "pm.environment.set(\"movieId\", jsonData._id);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://csc3916-assignment5-5tqz.onrender.com/movies?reviews=true",
+          "protocol": "https",
+          "host": [
+            "csc3916-assignment5-5tqz",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies"
+          ],
+          "query": [
+            {
+              "key": "reviews",
+              "value": "true"
+            },
+            {
+              "key": "q",
+              "value": "test",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "postReviews",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"review\": \"This movie is great.\",\r\n    \"rating\": \"5\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://csc3916-assignment5-5tqz.onrender.com/reviews/{{movieId}}",
+          "protocol": "https",
+          "host": [
+            "csc3916-assignment5-5tqz",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "reviews",
+            "{{movieId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getReviews",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://csc3916-assignment5-5tqz.onrender.com/reviews/{{movieId}}",
+          "protocol": "https",
+          "host": [
+            "csc3916-assignment5-5tqz",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "reviews",
+            "{{movieId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
