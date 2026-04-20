@@ -75,8 +75,23 @@ router.post('/signin', async (req, res) => { // Use async/await
 router.route('/movies')
     .get(authJwtController.isAuthenticated, async (req, res) => {
         try {
+            const pipeline = [];
+
+            if (req.query.q) {
+                const regex = new RegExp(req.query.q, 'i');
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { title: { $regex: regex } },
+                            { 'actors.actorName': { $regex: regex } },
+                            { 'actors.characterName': { $regex: regex } },
+                        ],
+                    },
+                });
+            }
+
             if (req.query.reviews === 'true') {
-                const movies = await Movie.aggregate([
+                pipeline.push(
                     {
                         $lookup: {
                             from: 'reviews',
@@ -85,7 +100,21 @@ router.route('/movies')
                             as: 'reviews',
                         },
                     },
-                ]);
+                    {
+                        $addFields: {
+                            avgRating: {
+                                $ifNull: [{ $avg: '$reviews.rating' }, 0],
+                            },
+                        },
+                    },
+                    {
+                        $sort: { avgRating: -1 },
+                    },
+                );
+            }
+
+            if (pipeline.length > 0) {
+                const movies = await Movie.aggregate(pipeline);
                 res.status(200).json(movies);
             } else {
                 const movies = await Movie.find();
@@ -103,6 +132,7 @@ router.route('/movies')
                 releaseDate: req.body.releaseDate,
                 genre: req.body.genre,
                 actors: req.body.actors,
+                imageUrl: req.body.imageUrl,
             });
             await movie.save();
             res.status(201).json({ success: true, movie });
@@ -118,65 +148,10 @@ router.route('/movies')
         res.status(405).json({ success: false, message: 'DELETE not supported on /movies. Use /movies/:title instead.' });
     });
 
-router.route('/movies/:title')
-    .get(authJwtController.isAuthenticated, async (req, res) => {
-        try {
-            if (req.query.reviews === 'true') {
-                const movies = await Movie.aggregate([
-                    { $match: { title: req.params.title } },
-                    {
-                        $lookup: {
-                            from: 'reviews',
-                            localField: '_id',
-                            foreignField: 'movieId',
-                            as: 'reviews',
-                        },
-                    },
-                ]);
-                if (!movies.length) return res.status(404).json({ success: false, message: 'Movie not found.' });
-                res.status(200).json(movies[0]);
-            } else {
-                const movie = await Movie.findOne({ title: req.params.title });
-                if (!movie) return res.status(404).json({ success: false, message: 'Movie not found.' });
-                res.status(200).json(movie);
-            }
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ success: false, message: 'Error retrieving movie.' });
-        }
-    })
-    .post(authJwtController.isAuthenticated, (req, res) => {
-        res.status(405).json({ success: false, message: 'POST not supported on /movies/:title. Use /movies instead.' });
-    })
-    .put(authJwtController.isAuthenticated, async (req, res) => {
-        try {
-            const updated = await Movie.findOneAndUpdate(
-                { title: req.params.title },
-                { $set: req.body },
-                { new: true, runValidators: true }
-            );
-            if (!updated) return res.status(404).json({ success: false, message: 'Movie not found.' });
-            res.status(200).json({ success: true, movie: updated });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ success: false, message: 'Error updating movie.' });
-        }
-    })
-    .delete(authJwtController.isAuthenticated, async (req, res) => {
-        try {
-            const deleted = await Movie.findOneAndDelete({ title: req.params.title });
-            if (!deleted) return res.status(404).json({ success: false, message: 'Movie not found.' });
-            res.status(200).json({ success: true, message: 'Movie deleted.' });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ success: false, message: 'Error deleting movie.' });
-        }
-    });
-
-router.route('/reviews')
+router.route('/reviews/:id')
     .get(async (req, res) => {
         try {
-            const reviews = await Review.find();
+            const reviews = await Review.find({ movieId: req.params.id }).sort({ rating: -1 });
             res.status(200).json(reviews);
         } catch (err) {
             console.error(err);
@@ -185,19 +160,19 @@ router.route('/reviews')
     })
     .post(authJwtController.isAuthenticated, async (req, res) => {
         try {
-            const movie = await Movie.findById(req.body.movieId);
+            const movie = await Movie.findById(req.params.id);
             if (!movie) {
                 return res.status(404).json({ success: false, message: 'Movie not found.' });
             }
             const existingReview = await Review.findOne({
-                movieId: req.body.movieId,
+                movieId: req.params.id,
                 username: req.body.username,
             });
             if (existingReview) {
                 return res.status(409).json({ success: false, message: 'You have already reviewed this movie.' });
             }
             const review = new Review({
-                movieId: req.body.movieId,
+                movieId: req.params.id,
                 username: req.body.username,
                 review: req.body.review,
                 rating: req.body.rating,
